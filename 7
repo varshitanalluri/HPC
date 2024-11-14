@@ -1,0 +1,46 @@
+// Writing a program in java on Multithreading – One Thread to Take Input, Another to Print on Console
+
+import java.util.Scanner;
+class InputThread extends Thread {
+    private SharedData sharedData;
+    public InputThread(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+    @Override
+    public void run() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter a message: ");
+        String input = scanner.nextLine();
+        sharedData.setMessage(input); 
+    }
+}
+class PrintThread extends Thread {
+    private SharedData sharedData;
+    public PrintThread(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+    @Override
+    public void run() {
+        while (sharedData.getMessage() == null) {
+        }
+        System.out.println("Message: " + sharedData.getMessage());
+    }
+}
+class SharedData {
+    private String message;
+    public synchronized void setMessage(String message) {
+        this.message = message;
+    }
+    public synchronized String getMessage() {
+        return message;
+    }
+}
+public class Main {  
+    public static void main(String[] args) {
+        SharedData sharedData = new SharedData();
+        InputThread inputThread = new InputThread(sharedData);
+        PrintThread printThread = new PrintThread(sharedData);
+        inputThread.start();
+        printThread.start();
+    }
+}
