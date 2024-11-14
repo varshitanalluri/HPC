@@ -1,0 +1,76 @@
+// 1) To understand concept of Thread sleep () using JAVA, and to write simple code to implement the concept. 
+// 2) Further develop a Java code to implement sorting application with concurrent thread and thread sleep function
+
+// 1)
+import java.io.*;
+import java.lang.Thread;
+class Main {
+    public static void main(String[] args) {
+        try {
+            for(int i = 0; i < 5; i++) {
+                Thread.sleep(1000);
+                System.out.println(i);
+             }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+
+// 2)
+import java.util.Arrays;
+class BubbleSortThread extends Thread {
+    private int[] arr;
+    public BubbleSortThread(int[] arr) {
+        this.arr = arr;
+    }
+    public void run() {
+        try {
+            for (int i = 0; i < arr.length - 1; i++) {
+                for (int j = 0; j < arr.length - i - 1; j++) {
+                    if (arr[j] > arr[j + 1]) {
+                        int temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    }
+                    Thread.sleep(50);
+                }
+            }
+            System.out.println("Sorted part: " + Arrays.toString(arr));
+        } catch (InterruptedException e) {
+            System.out.println("Thread interrupted");
+        }
+    }
+    public int[] getSortedArray() {
+        return arr;
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        int[] array = {9, 3, 5, 1, 4, 8, 7, 2, 6};
+        int[] part1 = Arrays.copyOfRange(array, 0, array.length / 2);
+        int[] part2 = Arrays.copyOfRange(array, array.length / 2, array.length);
+        BubbleSortThread t1 = new BubbleSortThread(part1);
+        BubbleSortThread t2 = new BubbleSortThread(part2);
+        t1.start();
+        t2.start();
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            System.out.println("Main thread interrupted");
+        }
+        int[] sortedArray = new int[array.length];
+        int i = 0, j = 0, k = 0;
+        while (i < part1.length && j < part2.length) {
+            if (part1[i] < part2[j]) {
+                sortedArray[k++] = part1[i++];
+            } else {
+                sortedArray[k++] = part2[j++];
+            }
+        }
+        while (i < part1.length) sortedArray[k++] = part1[i++];
+        while (j < part2.length) sortedArray[k++] = part2[j++];
+        System.out.println("Final sorted array: " + Arrays.toString(sortedArray));
+    }
+}
