@@ -1,0 +1,60 @@
+// Write a program using JAVA to perform matrix multiplication using multi-threading concept.
+
+class Main extends Thread {
+    private int row;
+    private int col;
+    private int[][] matrixA;
+    private int[][] matrixB;
+    private int[][] result;
+    public Main(int row, int col, int[][] matrixA, int[][] matrixB, int[][] result) {
+        this.row = row;
+        this.col = col;
+        this.matrixA = matrixA;
+        this.matrixB = matrixB;
+        this.result = result;
+    }
+    @Override
+    public void run() {
+        result[row][col] = 0;
+        for (int i = 0; i < matrixA[0].length; i++) {
+            result[row][col] += matrixA[row][i] * matrixB[i][col];
+        }
+    }
+    public static void main(String[] args) {
+        int[][] matrixA = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+        };
+        int[][] matrixB = {
+            {9, 8, 7},
+            {6, 5, 4},
+            {3, 2, 1}
+        };
+        int[][] result = new int[3][3];
+        Thread[][] threads = new Thread[3][3];
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                threads[i][j] = new Main(i, j, matrixA, matrixB, result);
+                threads[i][j].start();
+            }
+        }
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                try {
+                    threads[i][j].join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println("Result Matrix:");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(result[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+}
