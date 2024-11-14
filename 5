@@ -1,0 +1,49 @@
+// Use multi-threading to calculate sum of 10 thousand integers in Java using Synchronized keywords.
+
+class SumCalculator {
+    private int sum = 0;
+    public synchronized void addToSum(int value) {
+        sum += value;
+    }
+    public int getSum() {
+        return sum;
+    }
+}
+class SumThread extends Thread {
+    private int[] numbers;
+    private SumCalculator calculator;
+    public SumThread(int[] numbers, SumCalculator calculator) {
+        this.numbers = numbers;
+        this.calculator = calculator;
+    }
+    @Override
+    public void run() {
+        for (int number : numbers) {
+            calculator.addToSum(number);
+        }
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        int[] numbers = new int[10000];
+        for (int i = 0; i < numbers.length; i++) {
+            numbers[i] = i + 1;
+        }
+        SumCalculator calculator = new SumCalculator();
+        int[] part1 = new int[5000];
+        int[] part2 = new int[5000];
+        System.arraycopy(numbers, 0, part1, 0, 5000);
+        System.arraycopy(numbers, 5000, part2, 0, 5000);
+        SumThread thread1 = new SumThread(part1, calculator);
+        SumThread thread2 = new SumThread(part2, calculator);
+        thread1.start();
+        thread2.start();
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("The sum of 10000 integers is: " + calculator.getSum());
+    }
+}
